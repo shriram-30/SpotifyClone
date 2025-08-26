@@ -1,0 +1,98 @@
+.music-container{
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    gap:20px;
+    padding:20px;
+    color: #fff;
+    border-radius: 8px;
+   
+}
+
+.music-image{
+  width: 200px;
+  height:200px;
+  flex-shrink: 0;/* Romba mukkiyamana property. Screen size chinna aanaalum image size shrink aagama adhu apdiye irukum */
+  border-radius: 4px;
+}
+
+.music-details{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+.music-details .heading{
+  margin: 0 0 5px 0;
+  font-size: 2rem;
+}
+
+
+.music-details h2{
+  margin: 0;
+  font-weight: normal;
+  color: #b3b3b3;
+}
+
+/* Player Controls Section */
+.player-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  margin-top: 20px; /* Add some space above the controls */
+}
+
+.player-left, .player-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.play-button-container {
+  background-color: #1DB954; /* Spotify green */
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.1s ease-in-out;
+}
+
+.play-button-container:hover {
+    transform: scale(1.05);
+}
+
+.play-button-icon {
+  fill: #000000; /* Black icon */
+  width: 24px;
+  height: 24px;
+}
+
+.icon {
+  fill: #b3b3b3; /* Light gray for other icons */
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.icon:hover {
+    fill: #ffffff; /* White on hover */
+}
+
+.player-right {
+    gap: 10px;
+}
+
+.list-text {
+  color: #b3b3b3;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.list-text:hover {
+    color: #ffffff;
+}

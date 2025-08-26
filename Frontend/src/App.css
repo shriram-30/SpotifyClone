@@ -1,0 +1,38 @@
+/* Main app container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Main content area - takes up all space except music player */
+.main-content {
+  flex: 1;
+  padding-bottom: 90px; /* Height of music player + some padding */
+  overflow-y: auto;
+}
+
+/* Music player wrapper - fixed at bottom */
+.music-player-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #181818;
+  border-top: 1px solid #282828;
+  height: 80px; /* Adjust based on your music player height */
+}
+
+.mainContainer{
+  /*border:2px solid blue;*/
+  height:100vh;
+}
+
+.mainSectioncontentcontainer{
+  /*border: 2px Solid red;*/
+  height: 85%;
+  display: flex;
+  justify-content: space-evenly;
+}

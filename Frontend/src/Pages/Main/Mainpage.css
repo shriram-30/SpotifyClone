@@ -1,0 +1,49 @@
+/* Background styling like Spotify */
+.mainpage {
+    height: 100vh;
+    width: 100%;
+    background: linear-gradient(135deg, #121212,rgb(48, 48, 48)); /* dark → Spotify green */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Arial', sans-serif;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+  }
+  
+  /* Optional overlay to make text pop */
+  .overlay {
+    background: rgba(0, 0, 0, 0.6); /* semi-transparent black */
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Title styling */
+  .title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    line-height: 1.4;
+  }
+  
+  /* Enter button */
+  .enter-btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    background-color: #1db954; /* Spotify green */
+    color: black;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  /* Button hover effect */
+  .enter-btn:hover {
+    background-color: #1ed760; /* lighter green */
+    transform: scale(1.05);
+  }
+  

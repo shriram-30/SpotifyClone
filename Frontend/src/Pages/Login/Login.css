@@ -1,0 +1,393 @@
+/* Modern Spotify Auth Styles */
+:root {
+  --spotify-green: #1db954;
+  --spotify-green-hover: #1ed760;
+  --spotify-green-active: #1aa34a;
+  --spotify-black: #121212;
+  --spotify-dark: #000000;
+  --spotify-dark-gray: #282828;
+  --spotify-light-gray: #535353;
+  --spotify-lighter-gray: #b3b3b3;
+  --spotify-text: #ffffff;
+  --spotify-text-secondary: #b3b3b3;
+  --spotify-border: #2a2a2a;
+  --spotify-divider: #292929;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--spotify-black);
+  color: var(--spotify-text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Base Container */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 32px 24px;
+  background-color: var(--spotify-black);
+  background-image: linear-gradient(to bottom, #404040 0%, var(--spotify-black) 100%);
+  background-size: 100% 100%;
+  background-position: top center;
+  background-repeat: no-repeat;
+}
+
+.login-box {
+  width: 100%;
+  max-width: 450px;
+  padding: 32px;
+  background-color: var(--spotify-dark);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+/* Logo and Header */
+.auth-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.auth-logo svg {
+  color: var(--spotify-green);
+  flex-shrink: 0;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 0 32px;
+  color: var(--spotify-text);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+/* Social Login Buttons */
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 20px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid #727272;
+  border-radius: 500px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.social-btn:hover {
+  border-color: #fff;
+  transform: scale(1.02);
+}
+
+.social-btn:active {
+  transform: scale(0.98);
+}
+
+.social-btn span {
+  flex: 1;
+  text-align: center;
+}
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: #a7a7a7;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--spotify-divider);
+}
+
+.divider:not(:empty)::before {
+  margin-right: 1em;
+}
+
+.divider:not(:empty)::after {
+  margin-left: 1em;
+}
+
+/* Form Elements */
+.login-form {
+  width: 100%;
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--spotify-text);
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--spotify-text);
+  background: var(--spotify-dark-gray);
+  border: 1px solid var(--spotify-light-gray);
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+  border-color: var(--spotify-green);
+  box-shadow: 0 0 0 1px var(--spotify-green);
+}
+
+.form-input::placeholder {
+  color: #727272;
+}
+
+/* Form Options */
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0 24px;
+  font-size: 0.9rem;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  color: var(--spotify-text-secondary);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  padding-left: 30px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  background-color: #333;
+  border: 1px solid #555;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.checkbox-container:hover .checkmark {
+  border-color: #777;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: var(--spotify-green);
+  border-color: var(--spotify-green);
+}
+
+.remember-me input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #000;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.forgot-password {
+  color: var(--spotify-text-secondary);
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.2s ease;
+}
+
+.forgot-password:hover {
+  color: var(--spotify-green);
+  text-decoration: underline;
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  background-color: var(--spotify-green);
+  border: none;
+  border-radius: 500px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 24px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.submit-btn:hover {
+  background-color: var(--spotify-green-hover);
+  transform: scale(1.02);
+}
+
+.submit-btn:active {
+  background-color: var(--spotify-green-active);
+  transform: scale(0.98);
+}
+
+/* Sign Up Link */
+.signup-link {
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.button-loader {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  border-top-color: #000;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: var(--spotify-text-secondary);
+  font-size: 0.9rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--spotify-border);
+}
+
+.auth-divider span {
+  padding: 0 16px;
+}
+
+/* Toggle Auth */
+.auth-toggle {
+  margin-top: 24px;
+  color: var(--spotify-text-secondary);
+  font-size: 0.95rem;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: var(--spotify-green);
+  font-weight: 600;
+  margin-left: 4px;
+  padding: 4px 0 4px 4px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.toggle-button:hover {
+  color: var(--spotify-green-hover);
+  text-decoration: underline;
+}
+
+/* Error Message */
+.error-message {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: #ff6b6b;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  border: 1px solid rgba(255, 0, 0, 0.1);
+  text-align: left;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 24px 16px;
+  }
+  
+  .auth-container h1 {
+    font-size: 1.8rem;
+    margin-bottom: 24px;
+  }
+  
+  .form-input {
+    padding: 14px 16px;
+  }
+  
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .forgot-link {
+    margin-left: 0;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .form-input {
+    background: #2d2d2d;
+  }
+  
+  .auth-button.secondary {
+    border-color: #4a4a4a;
+  }
+}

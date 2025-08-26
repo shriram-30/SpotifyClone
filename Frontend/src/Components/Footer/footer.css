@@ -1,0 +1,38 @@
+.FooterSectionMainContainer{
+    height: 10%;
+    /*border: 2px solid red;*/
+    background-image: linear-gradient(to right, rgb(232, 49, 211), rgb(88, 88, 213));
+    position: relative;
+}
+.FooterText h3{
+        font-size: 1rem;
+        font-weight: 700;
+}
+.FooterText p{
+    font-size: 1rem;
+}
+.Footerbutton {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+  }
+  
+  .Footerbutton button {
+    background: white;
+    color: black;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    transition: transform 0.2s ease, background 0.3s ease;
+  }
+  
+  .Footerbutton button:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.05);
+  }
+  

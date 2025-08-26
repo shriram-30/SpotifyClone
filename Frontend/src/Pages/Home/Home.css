@@ -1,0 +1,70 @@
+/* Layout container */
+.home-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #121212; /* Spotify dark */
+    color: #e6e6e6;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  
+  /* Body: sidebar + main */
+  .home-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;      /* enables child overflow scrolling */
+    gap: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  
+  /* Sidebar column */
+  .home-sidebar {
+    flex: 0 0 280px;
+    max-width: 320px;
+    min-width: 240px;
+    height: 100%;
+    overflow: auto;
+    background: #181818;
+    border-radius: 8px;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  
+  /* Main content */
+  .home-main {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 100%;
+    overflow: auto;
+    background: #181818;
+    border-radius: 8px;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  
+  /* Subtle scrollbar styling */
+  .home-sidebar::-webkit-scrollbar,
+  .home-main::-webkit-scrollbar {
+    width: 10px;
+  }
+  .home-sidebar::-webkit-scrollbar-track,
+  .home-main::-webkit-scrollbar-track {
+    background: #111;
+  }
+  .home-sidebar::-webkit-scrollbar-thumb,
+  .home-main::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 6px;
+  }
+  
+  /* Responsive */
+  @media (max-width: 900px) {
+    .home-body {
+      flex-direction: column;
+    }
+    .home-sidebar {
+      flex: 0 0 auto;
+      max-width: 100%;
+    }
+  }

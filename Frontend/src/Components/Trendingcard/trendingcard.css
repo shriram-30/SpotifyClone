@@ -1,0 +1,153 @@
+/* Main container for trending cards with horizontal scrolling */
+.TrendingCardContent {
+    display: flex; /* Cards-a side-by-side kaata flexbox use aagum */
+    overflow-x: auto; /* Horizontal scroll-ku indha property */
+    gap: 24px; /* Oru card-kum innoru card-kum naduvula ulla space */
+    margin-top: 1rem;
+    padding: 8px 0 24px 0;
+    height: 450px; /* Trending section height-a increase pannirukken to ensure visibility */
+    -webkit-overflow-scrolling: touch; /* iOS devices-la smooth-a scroll aaga help panum */
+    scrollbar-width: none; /* Firefox-la scrollbar-a hide panna indha property use aagum */
+    -ms-overflow-style: none; /* Microsoft Edge-la scrollbar-a hide panna indha property use aagum */
+}
+
+/* Hide scrollbar for Chrome, Safari, and Opera */
+.TrendingCardContent::-webkit-scrollbar {
+    display: none; /* Webkit browsers-la scrollbar-a hide panna indha property use aagum */
+}
+
+/* Individual card styling */
+.CardContent {
+    flex: 0 0 180px; /* Card-oda fixed width */
+    height: 350px; /* Card-oda height-a increase pannirukken to fit content */
+    display: flex;
+    flex-direction: column;
+    background: transparent; /* Initial background color-a transparent-a mathirukken */
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.3s ease; /* Smooth transition-ku idhu help pannum */
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover effect for the entire card */
+.CardContent:hover {
+    background: #181818; /* Hover panna dark grey background-ku marum */
+    transform: translateY(-4px); /* Card konjam mela varum */
+}
+
+/* Card image container */
+.CardImage {
+    position: relative;
+    width: 100%;
+    padding-bottom: 100%; /* Image-a square-a kaata idhu use aagum */
+    margin-bottom: 16px;
+    background: #333;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Card title */
+.CardTitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    margin: 0 0 8px 0;
+    white-space: normal; /* Text wrap aagum, one line-la cut aagathu */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Card description */
+.CardDescription {
+    font-size: 14px;
+    color: #b3b3b3;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Rendu line-ku mela ponalum cut aagathu */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-clamp: 2;
+    white-space: normal; /* Text wrap aagum, full content theriyum */
+}
+
+/* Play button on hover */
+.CardContent:hover #playbutton {
+    display: flex; /* Hover panna play button display aagum */
+}
+
+/* Card image */
+.CardContent img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 10px;
+    transition: filter 0.3s ease;
+}
+
+/* Dims the image on hover, as requested */
+.CardContent:hover img {
+    filter: brightness(0.6); /* Hover panna image-a dim panna indha property */
+}
+
+.CardContainerText {
+    width: 100%;
+    margin: 8px 4px 0 4px;
+}
+
+.CardContainerText:hover {
+    text-decoration: underline;
+}
+
+.CardContainerText h2 {
+    font-size: 1rem;
+}
+
+.CardContainerText p {
+    font-size: 0.8rem;
+}
+
+.CardContent span {
+    background: rgb(87, 255, 87);
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: none;
+}
+
+.CardContent:hover #playbutton {
+    opacity: 1; /* Hover panna play button opacity 100% aagum */
+}
+
+.CardContent svg {
+    height: 50%;
+    width: 50%;
+}
+
+.CardContent:hover {
+    cursor: pointer;
+}
+
+.CardContent span#playbutton {
+    background: rgb(30, 215, 96);
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 2;
+}
