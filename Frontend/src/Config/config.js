@@ -67,8 +67,42 @@ export async function fetchArtists() {
 }
 
 /**
+ * Fetch a track by its MongoDB ID
+ * Returns: { _id, imgsrc, heading, subheading, music } | null
+ */
+export async function fetchTrackById(id) {
+  try {
+    if (!id) return null;
+    console.log(`[fetchTrackById] Fetching track with ID: ${id}`);
+    const res = await fetch(`${API_BASE}/api/music/tracks/${id}`);
+    if (!res.ok) {
+      console.error(`[fetchTrackById] HTTP error: ${res.status}`, await res.text());
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const json = await res.json();
+    console.log('[fetchTrackById] Response:', json);
+    
+    const track = json.data;
+    if (track) {
+      // Ensure the music URL is properly formatted
+      if (track.music && !track.music.startsWith('http') && !track.music.startsWith('blob:')) {
+        // If it's a relative path, prepend the API base URL
+        track.music = `${API_BASE}${track.music.startsWith('/') ? '' : '/'}${track.music}`;
+      }
+      console.log('[fetchTrackById] Returning track:', track);
+      return track;
+    }
+    console.warn('[fetchTrackById] No track found with ID:', id);
+    return null;
+  } catch (e) {
+    console.error('Failed to fetch track by ID:', e);
+    return null;
+  }
+}
+
+/**
  * Fetch a track by its song name (heading)
- * Returns: { imgsrc, heading, subheading, music } | null
+ * Returns: { _id, imgsrc, heading, subheading, music } | null
  */
 export async function fetchTrackByName(name) {
   try {

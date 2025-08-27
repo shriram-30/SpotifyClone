@@ -68,17 +68,17 @@ router.get('/trending', async (_req, res) => {
   }
 });
 
-// GET /api/music/tracks?name=<song name> - fetch by heading (case-insensitive)
+// GET /api/music/tracks?name=<song name> - fetch by songName (case-insensitive)
 router.get('/tracks', async (req, res) => {
   try {
     const { name } = req.query;
     if (!name) return res.status(400).json({ error: 'name query is required' });
 
-    console.log(`[GET /api/music/tracks] Searching for: ${name}`);
+    console.log(`[GET /api/music/tracks] Searching for song: ${name}`);
     
-    // Find matching tracks (case-insensitive exact match)
+    // Find matching tracks by songName (case-insensitive exact match)
     const tracks = await TrendingSong.find({
-      heading: { $regex: new RegExp(`^${name}$`, 'i') },
+      songName: { $regex: new RegExp(`^${name}$`, 'i') },
     }).lean();
 
     console.log(`[GET /api/music/tracks] Found ${tracks.length} tracks for query: ${name}`);
@@ -87,6 +87,7 @@ router.get('/tracks', async (req, res) => {
       // Log the first track for debugging
       console.log('[GET /api/music/tracks] First track data:', {
         _id: tracks[0]._id,
+        songName: tracks[0].songName,
         heading: tracks[0].heading,
         music: tracks[0].music,
         hasMusic: !!tracks[0].music
@@ -103,6 +104,51 @@ router.get('/tracks', async (req, res) => {
     res.status(500).json({ 
       success: false,
       error: 'Failed to fetch track by name',
+      details: e.message 
+    });
+  }
+});
+
+// GET /api/music/tracks/:id - fetch a single track by ID
+router.get('/tracks/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Validate if the ID is a valid MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Invalid track ID format' 
+      });
+    }
+
+    console.log(`[GET /api/music/tracks/${id}] Fetching track`);
+    
+    const track = await TrendingSong.findById(id).lean();
+    
+    if (!track) {
+      console.log(`[GET /api/music/tracks/${id}] Track not found`);
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Track not found' 
+      });
+    }
+
+    console.log(`[GET /api/music/tracks/${id}] Found track:`, {
+      _id: track._id,
+      songName: track.songName || 'N/A',
+      heading: track.heading || 'N/A'
+    });
+
+    res.json({ 
+      success: true,
+      data: track 
+    });
+  } catch (e) {
+    console.error(`[GET /api/music/tracks/:id] Error:`, e);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch track',
       details: e.message 
     });
   }

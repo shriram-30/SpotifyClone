@@ -12,3 +12,17 @@
     font-weight: 900;
     margin: 4px 8px 12px 8px;
 }
+
+.TrendingContent .showAll {
+    text-align: right;
+    cursor: pointer;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.showAll:hover{
+    
+    text-decoration: underline;
+}

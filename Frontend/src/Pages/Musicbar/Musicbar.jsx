@@ -109,7 +109,12 @@ const MusicPlayerBar = ({ currentSong, onClose, audioRef: parentAudioRef, isPlay
                     className="player-bar-album-cover" 
                 />
                 <div className="player-bar-song-info">
-                    <span className="player-bar-title">{currentSong.heading}</span>
+                    <span className="player-bar-title">
+                        {currentSong.songName || currentSong.heading}
+                        <span className="player-bar-duration">
+                            {formatTime(duration)}
+                        </span>
+                    </span>
                     <span className="player-bar-artist">{currentSong.subheading}</span>
                 </div>
                 <button 
