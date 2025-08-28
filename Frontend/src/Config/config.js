@@ -40,10 +40,15 @@ const API_BASE = import.meta?.env?.VITE_API_URL || 'http://localhost:5000';
  */
 export async function fetchTrending() {
   try {
-    const res = await fetch(`${API_BASE}/api/music/trending`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const res = await fetch(`${API_BASE}/api/music/trending-songs`);
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Error response:', errorText);
+      throw new Error(`HTTP ${res.status}: ${errorText}`);
+    }
     const json = await res.json();
-    return Array.isArray(json.data) ? json.data : [];
+    console.log('Fetched trending songs:', json);
+    return json.data || [];
   } catch (e) {
     console.error('Failed to fetch trending from backend:', e);
     return [];

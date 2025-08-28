@@ -1,9 +1,28 @@
-.mainContainer{
-  /*border:2px solid blue;*/
-  height:100vh;
+/* Main app container */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
+
+.app-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 90px); /* Account for MusicBar height */
+}
+
+.content-wrap {
+  flex: 1;
+  padding-bottom: 90px; /* Space for MusicBar */
+  overflow-y: auto;
+}
+
+.mainContainer{
+  height: 100%;
+}
+
 .mainSectioncontentcontainer{
-  /*border: 2px Solid red;*/
   height: 85%;
   display: flex;
   justify-content: space-evenly;

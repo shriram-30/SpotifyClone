@@ -1,272 +1,333 @@
-// src/components/MusicPlayerBar.js
-import React, { useState, useEffect, useRef } from "react";
-import './Musicbar.css';
+import React, { useEffect, useRef, useState } from 'react';
+import { useMusic } from '../../contexts/MusicContext';
 
-// MusicPlayerBar component that will be shown when a song is playing
-const MusicPlayerBar = ({ currentSong, onClose, audioRef: parentAudioRef, isPlaying: parentIsPlaying, onPlayPause }) => {
-    // State for player controls
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [volume, setVolume] = useState(70);
-    const [isMuted, setIsMuted] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const progressBarRef = useRef(null);
+const MusicBar = () => {
+  // State and refs
+  const { currentSong, isPlaying, togglePlayPause, audioRef } = useMusic();
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(70);
+  const [isMuted, setIsMuted] = useState(false);
+  const progressBarRef = useRef(null);
 
-    // Effect to handle time updates and duration changes
-    useEffect(() => {
-        const audio = parentAudioRef.current;
-        if (!audio) return;
+  // Styles
+  const playerBarStyle = {
+    backgroundColor: '#181818',
+    borderTop: '1px solid #282828',
+    height: '90px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0 16px',
+    position: 'fixed',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    transform: currentSong ? 'translateY(0)' : 'translateY(100%)',
+    transition: 'transform 0.3s ease-in-out'
+  };
 
-        const updateTime = () => setCurrentTime(audio.currentTime);
-        const updateDuration = () => {
-            if (audio.duration) {
-                setDuration(audio.duration);
-            }
-        };
-        
-        const handleCanPlay = () => {
-            setIsLoading(false);
-            // Auto-play when enough data is loaded
-            if (!parentIsPlaying) {
-                audio.play().catch(console.error);
-            }
-        };
-        
-        const handleWaiting = () => setIsLoading(true);
-        const handlePlaying = () => setIsLoading(false);
+  const leftSectionStyle = {
+    width: '30%',
+    minWidth: '180px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px'
+  };
 
-        audio.addEventListener('timeupdate', updateTime);
-        audio.addEventListener('durationchange', updateDuration);
-        audio.addEventListener('canplay', handleCanPlay);
-        audio.addEventListener('waiting', handleWaiting);
-        audio.addEventListener('playing', handlePlaying);
-        audio.addEventListener('ended', () => onPlayPause?.());
+  const centerSectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    flex: 1,
+    maxWidth: '722px'
+  };
 
-        // Initialize values
-        updateTime();
-        updateDuration();
+  const rightSectionStyle = {
+    width: '30%',
+    minWidth: '180px',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    gap: '8px'
+  };
 
-        return () => {
-            audio.removeEventListener('timeupdate', updateTime);
-            audio.removeEventListener('durationchange', updateDuration);
-            audio.removeEventListener('canplay', handleCanPlay);
-            audio.removeEventListener('waiting', handleWaiting);
-            audio.removeEventListener('playing', handlePlaying);
-            audio.removeEventListener('ended', () => onPlayPause?.());
-        };
-    }, [parentAudioRef, onPlayPause]);
+  const controlButtonStyle = {
+    background: 'none',
+    border: 'none',
+    color: '#b3b3b3',
+    cursor: 'pointer',
+    padding: '8px',
+    '&:hover': { color: 'white' }
+  };
 
-    // Toggle play/pause
-    const togglePlayPause = async () => {
-        if (!parentAudioRef.current) return;
-        
-        try {
-            if (onPlayPause) {
-                onPlayPause();
-            } else if (parentIsPlaying) {
-                setIsLoading(false);
-                await parentAudioRef.current.pause();
-            } else {
-                setIsLoading(true);
-                await parentAudioRef.current.play();
-                setIsLoading(false);
-            }
-        } catch (error) {
-            console.error('Error toggling play/pause:', error);
-            setIsLoading(false);
-        }
+  const playPauseButtonStyle = {
+    background: 'white',
+    border: 'none',
+    borderRadius: '50%',
+    width: '32px',
+    height: '32px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    margin: '0 16px',
+    '&:hover': { transform: 'scale(1.05)' }
+  };
+
+  const progressBarStyle = {
+    flex: 1,
+    height: '4px',
+    backgroundColor: '#404040',
+    borderRadius: '2px',
+    cursor: 'pointer',
+    position: 'relative',
+    overflow: 'hidden'
+  };
+
+  const timeStyle = {
+    color: '#a7a7a7',
+    fontSize: '11px',
+    minWidth: '40px',
+    textAlign: 'center'
+  };
+
+  // Progress fill style that depends on state
+  const progressFillStyle = {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: '#b3b3b3',
+    width: `${(currentTime / duration) * 100}%`,
+    '&:hover': { backgroundColor: '#1db954' }
+  };
+  
+  // Debug log when currentSong changes
+  useEffect(() => {
+    console.log('MusicBar - Current song:', currentSong);
+    console.log('MusicBar - isPlaying:', isPlaying);
+  }, [currentSong, isPlaying]);
+
+  // Effect for time updates and duration changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        setDuration(audio.duration);
+      }
     };
+    
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('durationchange', updateDuration);
+    audio.addEventListener('canplay', updateDuration);
 
-    // Handle volume change
-    const handleVolumeChange = (e) => {
-        const newVolume = parseFloat(e.target.value);
-        setVolume(newVolume);
-        if (parentAudioRef.current) {
-            parentAudioRef.current.volume = newVolume / 100;
-            setIsMuted(newVolume === 0);
-        }
+    updateTime();
+    updateDuration();
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('durationchange', updateDuration);
+      audio.removeEventListener('canplay', updateDuration);
     };
+  }, [currentSong, audioRef]);
 
-    // Format time (seconds to MM:SS)
-    const formatTime = (time) => {
-        if (isNaN(time) || time === null) return "0:00";
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60);
-        return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-    };
+  // Handle volume changes
+  const handleVolumeChange = (e) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume / 100;
+      setIsMuted(newVolume === 0);
+    }
+  };
 
-    // If no song is selected, don't render anything
-    if (!currentSong) return null;
+  // Toggle mute/unmute
+  const toggleMute = () => {
+    if (!audioRef.current) return;
+    if (isMuted) {
+      audioRef.current.volume = volume / 100;
+      setIsMuted(false);
+    } else {
+      audioRef.current.volume = 0;
+      setIsMuted(true);
+    }
+  };
 
-    return (
-        <div className="music-player-bar-container">
+  // Handle seek on progress bar
+  const handleSeek = (e) => {
+    if (!audioRef.current || !progressBarRef.current) return;
+    const progressBar = progressBarRef.current;
+    const clickPosition = e.nativeEvent.offsetX;
+    const progressBarWidth = progressBar.clientWidth;
+    const seekPosition = (clickPosition / progressBarWidth) * duration;
+    audioRef.current.currentTime = seekPosition;
+    setCurrentTime(seekPosition);
+  };
 
-            {/* Left Section: Album Art & Info */}
-            <div className="player-bar-left">
-                <img 
-                    src={currentSong.imgsrc} 
-                    alt="Album Cover" 
-                    className="player-bar-album-cover" 
-                />
-                <div className="player-bar-song-info">
-                    <span className="player-bar-title">
-                        {currentSong.songName || currentSong.heading}
-                        <span className="player-bar-duration">
-                            {formatTime(duration)}
-                        </span>
-                    </span>
-                    <span className="player-bar-artist">{currentSong.subheading}</span>
-                </div>
-                <button 
-                    onClick={onClose}
-                    className="close-button"
-                    aria-label="Close player"
-                >
-                    ×
-                </button>
-            </div>
+  // Format time (seconds to MM:SS)
+  const formatTime = (time) => {
+    if (isNaN(time) || time === null) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
 
-            {/* Center Section: Controls & Progress Bar */}
-            <div className="player-bar-center">
-                <div className="player-bar-controls">
-                    <button className="control-button">
-                        <svg viewBox="0 0 24 24" className="player-bar-icon control-small-icon">
-                            <path d="M4 14.5a.5.5 0 01.5-.5h15a.5.5 0 010 1h-15a.5.5 0 01-.5-.5zm0-7a.5.5 0 01.5-.5h15a.5.5 0 010 1h-15a.5.5 0 01-.5-.5z"></path>
-                        </svg>
-                    </button>
-                    
-                    <button className="control-button">
-                        <svg viewBox="0 0 24 24" className="player-bar-icon control-medium-icon">
-                            <path d="M14.07 4.07L12 2 6 8l6 6 2.07-2.07L10.14 8z"></path>
-                        </svg>
-                    </button>
-                    
-                    {/* 👇️ இந்த இடத்துல conditional rendering-ஐ மாற்றி அமைக்கவும் */}
-                    <button 
-                        className="play-pause-button-circle"
-                        onClick={togglePlayPause}
-                        aria-label={parentIsPlaying ? 'Pause' : 'Play'}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            // Loading spinner
-                            <svg className="player-bar-icon play-pause-icon" viewBox="0 0 24 24">
-                                <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"></path>
-                            </svg>
-                        ) : parentIsPlaying ? (
-                            // Pause icon
-                            <svg viewBox="0 0 24 24" className="player-bar-icon play-pause-icon">
-                                <path d="M6 4.75a.75.75 0 01.75-.75h2.5a.75.75 0 01.75.75v14.5a.75.75 0 01-.75.75h-2.5a.75.75 0 01-.75-.75V4.75zm7.5 0a.75.75 0 01.75-.75h2.5a.75.75 0 01.75.75v14.5a.75.75 0 01-.75.75h-2.5a.75.75 0 01-.75-.75V4.75z"></path>
-                            </svg>
-                        ) : (
-                            // Play icon
-                            <svg viewBox="0 0 24 24" className="player-bar-icon play-pause-icon play-icon-actual">
-                                <path d="M7.05 3.606l13.49 7.788a.7.7 0 010 1.212L7.05 20.394A.7.7 0 016 19.788V4.212a.7.7 0 011.05-.606z"></path>
-                            </svg>
-                        )}
-                    </button>
-                    {/* 👆️ இங்க மாற்றம் முடிந்தது */}
+  // Don't render anything if no song is selected
+  if (!currentSong) return null;
 
-                    <button className="control-button">
-                        <svg viewBox="0 0 24 24" className="player-bar-icon control-medium-icon">
-                            <path d="M17.07 8.07L15 6 9 12l6 6 2.07-2.07L13.14 12z"></path>
-                        </svg>
-                    </button>
-                    
-                    <button className="control-button">
-                        <svg viewBox="0 0 24 24" className="player-bar-icon control-small-icon">
-                            <path d="M4.5 9.5a.5.5 0 000 1h15a.5.5 0 000-1h-15zm0 4a.5.5 0 000 1h15a.5.5 0 000-1h-15z"></path>
-                        </svg>
-                    </button>
-                </div>
 
-                {/* Progress Bar */}
-                <div className="player-bar-progress-section">
-                    <span className="player-bar-time">{formatTime(currentTime)}</span>
-                    <input
-                        type="range"
-                        min="0"
-                        max={duration || 100}
-                        value={currentTime}
-                        onChange={(e) => {
-                            const newTime = parseFloat(e.target.value);
-                            if (parentAudioRef.current) {
-                                parentAudioRef.current.currentTime = newTime;
-                                setCurrentTime(newTime);
-                            }
-                        }}
-                        className="player-bar-progress-slider"
-                        style={{
-                            opacity: isLoading ? 0.5 : 1,
-                            '--progress': `${(currentTime / (duration || 100)) * 100}%`
-                        }}
-                    />
-                    <span className="player-bar-time">{formatTime(duration)}</span>
-                </div>
-            </div>
-
-            {/* Right Section: Volume & Fullscreen */}
-            <div className="player-bar-right">
-                <button className="control-button">
-                    <svg viewBox="0 0 24 24" className="player-bar-icon">
-                        <path d="M15 8V6a2 2 0 014 0v2h3a1 1 0 011 1v11a1 1 0 01-1 1H7a1 1 0 01-1-1V9a1 1 0 011-1h3zm-1 0H7a1 1 0 01-1-1V6a1 1 0 011-1h2a1 1 0 011 1v1a1 1 0 01-1 1zm4 0h-2a1 1 0 01-1-1V6a1 1 0 011-1h2a1 1 0 011 1v1a1 1 0 01-1 1z"></path>
-                    </svg>
-                </button>
-                
-                <div className="volume-control-section">
-                    <button 
-                        onClick={() => {
-                            if (parentAudioRef.current) {
-                                if (isMuted) {
-                                    parentAudioRef.current.volume = volume / 100;
-                                    setIsMuted(false);
-                                } else {
-                                    parentAudioRef.current.volume = 0;
-                                    setIsMuted(true);
-                                }
-                            }
-                        }}
-                        aria-label={isMuted ? 'Unmute' : 'Mute'}
-                        className="control-button"
-                    >
-                        {isMuted || volume === 0 ? (
-                            <svg viewBox="0 0 24 24" className="player-bar-icon">
-                                <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51A8.796 8.796 0 0021 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 4L2.86 5.41 7.03 9.6 3 9.6v4.8h3.03l4.06 4.06c-.65.49-1.38.88-2.18 1.11v2.06a8.99 8.99 0 007.61-4.43l1.99 1.99 1.41-1.41L4.27 4zM12 4l-1.5 1.5 5.74 5.74 1.5-1.5L12 4z"></path>
-                            </svg>
-                        ) : volume > 50 ? (
-                            <svg viewBox="0 0 24 24" className="player-bar-icon">
-                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path>
-                            </svg>
-                        ) : (
-                            <svg viewBox="0 0 24 24" className="player-bar-icon">
-                                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"></path>
-                            </svg>
-                        )}
-                    </button>
-                    <input 
-                        type="range" 
-                        min="0" 
-                        max="100" 
-                        value={isMuted ? 0 : volume} 
-                        onChange={(e) => {
-                            const newVolume = parseFloat(e.target.value);
-                            setVolume(newVolume);
-                            if (parentAudioRef.current) {
-                                parentAudioRef.current.volume = newVolume / 100;
-                                setIsMuted(newVolume === 0);
-                            }
-                        }}
-                        onMouseUp={() => {
-                            if (volume === 0) {
-                                setIsMuted(true);
-                            }
-                        }}
-                        className="player-bar-volume-slider" 
-                    />
-                </div>
-            </div>
+  return (
+    <div style={playerBarStyle}>
+      {/* Left section - Track info */}
+      <div style={leftSectionStyle}>
+        <img 
+          src={currentSong.imgsrc || 'https://via.placeholder.com/56'} 
+          alt="Album Cover" 
+          style={{
+            width: '56px',
+            height: '56px',
+            objectFit: 'cover'
+          }}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = 'https://via.placeholder.com/56';
+          }}
+        />
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          minWidth: 0
+        }}>
+          <span style={{
+            color: 'white',
+            fontSize: '14px',
+            fontWeight: 500,
+            marginBottom: '4px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }} title={currentSong.title || 'Unknown Track'}>
+            {currentSong.title || 'Unknown Track'}
+          </span>
+          <span style={{
+            color: '#b3b3b3',
+            fontSize: '12px',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }} title={currentSong.artist || 'Unknown Artist'}>
+            {currentSong.artist || 'Unknown Artist'}
+          </span>
         </div>
-    );
+      </div>
+
+      {/* Center section - Playback controls */}
+      <div style={centerSectionStyle}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px',
+          marginBottom: '8px'
+        }}>
+          <button style={controlButtonStyle}>
+            <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M13.151.922a.75.75 0 10-1.06 1.06L13.109 3H11.16a3.75 3.75 0 00-2.873 1.34l-6.173 7.356A2.25 2.25 0 01.39 12.5H0V14h.391a3.75 3.75 0 002.873-1.34l6.173-7.356a2.25 2.25 0 011.724-.804h1.947l-1.017 1.018a.75.75 0 001.06 1.06L15.98 3.75 13.15.922zM.391 12.5H0v-1h.391c1.109 0 2.16-.49 2.873-1.34l6.173-7.356A2.25 2.25 0 0111.16 4h1.947l-1.017 1.018a.75.75 0 101.06 1.06L15.98 3.75 13.15.922a.75.75 0 00-1.06 1.06L13.11 3H11.16a3.75 3.75 0 00-2.873 1.34l-6.173 7.356A2.25 2.25 0 01.39 12.5z"></path>
+            </svg>
+          </button>
+          <button style={controlButtonStyle}>
+            <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M12.7 1a.7.7 0 00-.7.7v5.15L2.05 1.107A.7.7 0 001 1.712v12.575a.7.7 0 001.05.607L12 9.149V14.3a.7.7 0 00.7.7h1.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7h-1.6z"></path>
+            </svg>
+          </button>
+          <button onClick={togglePlayPause} style={playPauseButtonStyle}>
+            {isPlaying ? (
+              <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="black">
+                <path d="M2.7 1a.7.7 0 00-.7.7v12.6a.7.7 0 00.7.7h2.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7H2.7zm8 0a.7.7 0 00-.7.7v12.6a.7.7 0 00.7.7h2.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7h-2.6z"></path>
+              </svg>
+            ) : (
+              <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="black" style={{ marginLeft: '2px' }}>
+                <path d="M3 1.713a.7.7 0 011.05-.607l10.89 6.288a.7.7 0 010 1.212L4.05 14.894A.7.7 0 013 14.288V1.713z"></path>
+              </svg>
+            )}
+          </button>
+          <button style={controlButtonStyle}>
+            <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M3.3 1a.7.7 0 01.7.7v5.15l9.95-5.744a.7.7 0 011.05.606v12.575a.7.7 0 01-1.05.607L4 9.149V14.3a.7.7 0 01-.7.7H1.7a.7.7 0 01-.7-.7V1.7a.7.7 0 01.7-.7h1.6z"></path>
+            </svg>
+          </button>
+          <button style={controlButtonStyle}>
+            <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M0 4.75A3.75 3.75 0 013.75 1h8.5A3.75 3.75 0 0116 4.75v5a3.75 3.75 0 01-3.75 3.75H9.81l1.018 1.018a.75.75 0 11-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 111.06 1.06L9.811 12h2.439a2.25 2.25 0 002.25-2.25v-5a2.25 2.25 0 00-2.25-2.25h-8.5A2.25 2.25 0 001.5 4.75v5A2.25 2.25 0 003.75 12H5v1.5H3.75A3.75 3.75 0 010 9.75v-5z"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          gap: '8px',
+          maxWidth: '600px'
+        }}>
+          <span style={timeStyle}>
+            {formatTime(currentTime)}
+          </span>
+          <div 
+            style={progressBarStyle}
+            ref={progressBarRef}
+            onClick={handleSeek}
+          >
+            <div style={progressFillStyle} />
+          </div>
+          <span style={timeStyle}>
+            {formatTime(duration)}
+          </span>
+        </div>
+      </div>
+
+      {/* Right section - Volume controls */}
+      <div style={rightSectionStyle}>
+        <button 
+          onClick={toggleMute}
+          style={controlButtonStyle}
+        >
+          <svg role="presentation" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+            {isMuted || volume === 0 ? (
+              <path d="M13.86 5.47a.75.75 0 00-1.061 0l-1.47 1.47-1.47-1.47A.75.75 0 008.8 6.53L10.269 8l-1.47 1.47a.75.75 0 101.06 1.06l1.47-1.47 1.47 1.47a.75.75 0 001.06-1.06L12.39 8l1.47-1.47a.75.75 0 000-1.06z"></path>
+            ) : volume < 30 ? (
+              <path d="M1.5 6a.75.75 0 00-1.5 0v4a.75.75 0 001.5 0V6zm3.5-4v12h1.5V2H5z"></path>
+            ) : (
+              <path d="M9.741.85a.75.75 0 01.375.65v13a.75.75 0 01-1.125.65l-6.925-4a3.642 3.642 0 01-1.33-4.967 3.639 3.639 0 011.33-1.332l6.925-4a.75.75 0 01.75 0zm-6.924 5.3a2.139 2.139 0 000 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 010 4.88z"></path>
+            )}
+          </svg>
+        </button>
+        <div style={{ width: '100px' }}>
+          <input 
+            type="range" 
+            min="0" 
+            max="100" 
+            value={isMuted ? 0 : volume}
+            onChange={handleVolumeChange}
+            style={{
+              width: '100%',
+              height: '4px',
+              WebkitAppearance: 'none',
+              backgroundColor: '#404040',
+              borderRadius: '2px',
+              outline: 'none',
+              cursor: 'pointer'
+            }}
+          />
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default MusicPlayerBar;
+export default MusicBar;

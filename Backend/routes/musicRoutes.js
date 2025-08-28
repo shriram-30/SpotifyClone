@@ -4,6 +4,28 @@ import TrendingSong from '../models/Trendingsong.js';
 
 const router = Router();
 
+// Get all trending songs
+router.get('/trending-songs', async (req, res) => {
+    console.log('Fetching trending songs...');
+    try {
+        const songs = await TrendingSong.find({}).limit(50);
+        console.log(`Found ${songs.length} trending songs`);
+        res.status(200).json({
+            success: true,
+            count: songs.length,
+            data: songs
+        });
+    } catch (error) {
+        console.error('Error fetching trending songs:', error);
+        res.status(500).json({ 
+            success: false,
+            status: 'error', 
+            message: 'Failed to fetch trending songs',
+            error: error.message 
+        });
+    }
+});
+
 // Test endpoint to verify database connection and data
 router.get('/test-db', async (req, res) => {
   try {
@@ -54,18 +76,6 @@ router.get('/test', (req, res) => {
     status: 'API is working',
     timestamp: new Date().toISOString()
   });
-});
-
-// GET /api/music/trending - fetch all tracks from DB
-router.get('/trending', async (_req, res) => {
-  try {
-    const data = await TrendingSong.find({}).lean();
-    console.log(`[GET /api/music/trending] -> ${data.length} items`);
-    res.json({ data });
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: 'Failed to fetch tracks' });
-  }
 });
 
 // GET /api/music/tracks?name=<song name> - fetch by songName (case-insensitive)
@@ -153,5 +163,7 @@ router.get('/tracks/:id', async (req, res) => {
     });
   }
 });
+
+
 
 export default router;
