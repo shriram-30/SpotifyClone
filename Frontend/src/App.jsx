@@ -6,6 +6,7 @@ import './App.css'
 import Mainpage from './Pages/Main/Mainpage.jsx'
 import HomePage from './Pages/Home/Home.jsx'
 import SpecificMusicPage from './Pages/specificMusicPage/specificMusicPage.jsx'
+import TrendingSongs from './Pages/TrendingSongs/TrendingSongs.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 
 const AuthForm = React.lazy(() => import('./Pages/Login/Login.jsx'))
@@ -23,6 +24,7 @@ function App() {
                 {/* this is used check route is protected only user allowed after successful authentication*/}
                 <Route element={<ProtectedRoute />}>
                   <Route path="/home" element={<HomePage />} />
+                  <Route path="/trending" element={<TrendingSongs />} />
                   <Route path="/track/:id" element={<SpecificMusicPage />} />
                   
                 </Route>

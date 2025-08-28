@@ -1,41 +1,16 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import './trendingcard.css'
-import { fetchTrending } from '../../Config/config'
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './trendingcard.css';
+import { MusicContext } from '../../contexts/MusicContext';
 
 const TrendingCard = ({ setcurrentpage, setcurrentEle }) => {
-  const [items, setItems] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const navigate = useNavigate()
+  const { getLimitedTrendingSongs, isLoading, error } = useContext(MusicContext);
+  const items = getLimitedTrendingSongs(9);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        const data = await fetchTrending()
-        if (!cancelled) {
-          if (Array.isArray(data) && data.length > 0) {
-            // Limit to 9 items if there are more
-            const limitedItems = data.slice(0, 9)
-            setItems(limitedItems)
-          } else {
-            setItems([])
-          }
-        }
-      } catch (e) {
-        console.error('Error fetching trending songs:', e)
-        if (!cancelled) setError('Failed to load trending songs')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    })()
-    return () => { cancelled = true }
-  }, [])
-
-  if (loading) return <div className='TrendingCardContent'>Loading trending songs...</div>
-  if (error) return <div className='TrendingCardContent error-message'>{error}</div>
-  if (!items.length) return <div className='TrendingCardContent'>No trending tracks available</div>
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (items.length === 0) return <div>No trending songs found</div>;
 
   return (
     <div className='TrendingCardContent'>
@@ -44,9 +19,9 @@ const TrendingCard = ({ setcurrentpage, setcurrentEle }) => {
           key={song._id} 
           className="CardContent"
           onClick={() => {
-            if (setcurrentpage) setcurrentpage('home')
-            if (setcurrentEle) setcurrentEle(song)
-            navigate(`/track/${song._id}`, { state: { track: song } })
+            if (setcurrentpage) setcurrentpage('home');
+            if (setcurrentEle) setcurrentEle(song);
+            navigate(`/track/${song._id}`, { state: { track: song } });
           }}
         >
           <img src={song.imgsrc} alt={song.heading} className="song-cover" />
@@ -62,7 +37,7 @@ const TrendingCard = ({ setcurrentpage, setcurrentEle }) => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default TrendingCard
+export default TrendingCard;

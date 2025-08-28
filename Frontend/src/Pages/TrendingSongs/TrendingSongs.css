@@ -1,0 +1,154 @@
+.trending-songs-page {
+  padding: 32px;
+  color: white;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - 200px);
+}
+
+.trending-songs-header {
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.trending-songs-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.trending-count {
+  color: #b3b3b3;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.trending-songs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px;
+  padding: 16px 0;
+  margin-top: 20px;
+}
+
+.trending-song-card {
+  background: transparent;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.trending-song-card:hover {
+  background: #282828;
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.trending-song-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.trending-song-card:hover .trending-song-cover {
+  transform: scale(1.03);
+}
+
+.trending-song-info {
+  min-height: 60px;
+  padding: 0 4px;
+}
+
+.trending-song-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffff;
+}
+
+.trending-song-artist {
+  font-size: 0.875rem;
+  color: #b3b3b3;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Loading and Error States */
+.trending-songs-page h1 {
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .trending-songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .trending-songs-page {
+    padding: 24px 16px;
+  }
+  
+  .trending-songs-header h1 {
+    font-size: 2rem;
+  }
+  
+  .trending-songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trending-songs-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
+  
+  .trending-song-card {
+    padding: 12px;
+  }
+  
+  .trending-song-title {
+    font-size: 0.9rem;
+  }
+  
+  .trending-song-artist {
+    font-size: 0.8rem;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.shuffle-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid #535353;
+  color: #b3b3b3;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}

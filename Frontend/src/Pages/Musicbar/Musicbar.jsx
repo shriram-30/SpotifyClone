@@ -1,9 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useMusic } from '../../contexts/MusicContext';
 
 const MusicBar = () => {
   // State and refs
-  const { currentSong, isPlaying, togglePlayPause, audioRef } = useMusic();
+  const { 
+    currentSong, 
+    isPlaying, 
+    togglePlayPause, 
+    audioRef, 
+    playNextSong, 
+    playPreviousSong,
+    isShuffled,
+    toggleShuffle
+  } = useMusic();
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(70);
@@ -33,7 +42,8 @@ const MusicBar = () => {
     minWidth: '180px',
     display: 'flex',
     alignItems: 'center',
-    gap: '12px'
+    gap: '12px',
+    overflow: 'hidden'
   };
 
   const centerSectionStyle = {
@@ -180,51 +190,63 @@ const MusicBar = () => {
   // Don't render anything if no song is selected
   if (!currentSong) return null;
 
-
   return (
     <div style={playerBarStyle}>
-      {/* Left section - Track info */}
+      {/* Left section - Song info */}
       <div style={leftSectionStyle}>
-        <img 
-          src={currentSong.imgsrc || 'https://via.placeholder.com/56'} 
-          alt="Album Cover" 
-          style={{
-            width: '56px',
-            height: '56px',
-            objectFit: 'cover'
-          }}
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = 'https://via.placeholder.com/56';
-          }}
-        />
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          minWidth: 0
-        }}>
-          <span style={{
-            color: 'white',
-            fontSize: '14px',
-            fontWeight: 500,
-            marginBottom: '4px',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }} title={currentSong.title || 'Unknown Track'}>
-            {currentSong.title || 'Unknown Track'}
-          </span>
-          <span style={{
-            color: '#b3b3b3',
-            fontSize: '12px',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }} title={currentSong.artist || 'Unknown Artist'}>
-            {currentSong.artist || 'Unknown Artist'}
-          </span>
-        </div>
+        {currentSong && (
+          <>
+            <img 
+              src={currentSong.imgsrc} 
+              alt={currentSong.heading}
+              style={{
+                width: '56px',
+                height: '56px',
+                objectFit: 'cover',
+                borderRadius: '4px',
+                flexShrink: 0
+              }}
+            />
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              marginLeft: '12px',
+              minWidth: 0,
+              width: '100%',
+              overflow: 'hidden'
+            }}>
+              {/* Track Name */}
+              <div style={{
+                color: 'white',
+                fontSize: '14px',
+                fontWeight: 500,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                width: '100%',
+                height: '20px',
+                lineHeight: '20px'
+              }}>
+                {currentSong.heading || currentSong.title || 'Unknown Track'}
+              </div>
+              
+              {/* Artist Name */}
+              <div style={{
+                color: '#b3b3b3',
+                fontSize: '11px',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                width: '100%',
+                height: '16px',
+                lineHeight: '16px',
+                marginTop: '2px'
+              }}>
+                {currentSong.artist || currentSong.subheading || ''}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Center section - Playback controls */}
@@ -235,17 +257,74 @@ const MusicBar = () => {
           gap: '16px',
           marginBottom: '8px'
         }}>
-          <button style={controlButtonStyle}>
+          {/* Shuffle button */}
+          <button 
+            style={{
+              ...controlButtonStyle,
+              color: isShuffled ? '#1DB954' : '#b3b3b3',
+              opacity: currentSong ? 1 : 0.5,
+              cursor: currentSong ? 'pointer' : 'default',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              backgroundColor: 'transparent',
+              transition: 'color 0.2s ease, transform 0.1s ease',
+              position: 'relative',
+              ':hover': {
+                color: isShuffled ? '#1ED760' : '#fff',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)'
+              },
+              ':active': {
+                transform: 'scale(0.95)'
+              },
+              '&:disabled': {
+                opacity: 0.5,
+                cursor: 'default'
+              }
+            }}
+            onMouseEnter={(e) => {
+              if (currentSong) {
+                e.currentTarget.style.color = isShuffled ? '#1ED760' : '#fff';
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentSong) {
+                e.currentTarget.style.color = isShuffled ? '#1DB954' : '#b3b3b3';
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }
+            }}
+            onClick={currentSong ? toggleShuffle : null}
+            aria-label={isShuffled ? 'Disable shuffle' : 'Enable shuffle'}
+            disabled={!currentSong}
+          >
             <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M13.151.922a.75.75 0 10-1.06 1.06L13.109 3H11.16a3.75 3.75 0 00-2.873 1.34l-6.173 7.356A2.25 2.25 0 01.39 12.5H0V14h.391a3.75 3.75 0 002.873-1.34l6.173-7.356a2.25 2.25 0 011.724-.804h1.947l-1.017 1.018a.75.75 0 001.06 1.06L15.98 3.75 13.15.922zM.391 12.5H0v-1h.391c1.109 0 2.16-.49 2.873-1.34l6.173-7.356A2.25 2.25 0 0111.16 4h1.947l-1.017 1.018a.75.75 0 101.06 1.06L15.98 3.75 13.15.922a.75.75 0 00-1.06 1.06L13.11 3H11.16a3.75 3.75 0 00-2.873 1.34l-6.173 7.356A2.25 2.25 0 01.39 12.5z"></path>
+              <path d="M13.151.922a.75.75 0 10-1.094 1.063L14.5 3.5l-2.32 2.32a.75.75 0 001.06 1.06l2.32-2.32 2.32 2.32a.75.75 0 101.06-1.06L16.56 2.5l2.32-2.32a.75.75 0 00-1.06-1.06l-2.32 2.32-2.32-2.32a.75.75 0 00-1.031.082z"></path>
+              <path d="M8 4.466V.534a.25.25 0 01.41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 018 4.466z"></path>
+              <path d="M8 5.5a.5.5 0 01-.5.5H1.5v9h13v-9H8.5a.5.5 0 01-.5-.5z"></path>
             </svg>
           </button>
-          <button style={controlButtonStyle}>
+
+          {/* Previous track button */}
+          <button 
+            style={controlButtonStyle}
+            onClick={playPreviousSong}
+            aria-label="Previous track"
+          >
             <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M12.7 1a.7.7 0 00-.7.7v5.15L2.05 1.107A.7.7 0 001 1.712v12.575a.7.7 0 001.05.607L12 9.149V14.3a.7.7 0 00.7.7h1.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7h-1.6z"></path>
+              <path d="M3.3 1a.7.7 0 01.7.7v5.15l9.95-5.744a.7.7 0 011.05.606v12.575a.7.7 0 01-1.05.607L4 9.149V14.3a.7.7 0 01-.7.7H1.7a.7.7 0 01-.7-.7V1.7a.7.7 0 01.7-.7h1.6z"></path>
             </svg>
           </button>
-          <button onClick={togglePlayPause} style={playPauseButtonStyle}>
+
+          {/* Play/Pause button */}
+          <button 
+            onClick={togglePlayPause} 
+            style={playPauseButtonStyle}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
             {isPlaying ? (
               <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="black">
                 <path d="M2.7 1a.7.7 0 00-.7.7v12.6a.7.7 0 00.7.7h2.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7H2.7zm8 0a.7.7 0 00-.7.7v12.6a.7.7 0 00.7.7h2.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7h-2.6z"></path>
@@ -256,14 +335,15 @@ const MusicBar = () => {
               </svg>
             )}
           </button>
-          <button style={controlButtonStyle}>
+
+          {/* Next track button */}
+          <button 
+            style={controlButtonStyle}
+            onClick={playNextSong}
+            aria-label="Next track"
+          >
             <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M3.3 1a.7.7 0 01.7.7v5.15l9.95-5.744a.7.7 0 011.05.606v12.575a.7.7 0 01-1.05.607L4 9.149V14.3a.7.7 0 01-.7.7H1.7a.7.7 0 01-.7-.7V1.7a.7.7 0 01.7-.7h1.6z"></path>
-            </svg>
-          </button>
-          <button style={controlButtonStyle}>
-            <svg role="img" height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
-              <path d="M0 4.75A3.75 3.75 0 013.75 1h8.5A3.75 3.75 0 0116 4.75v5a3.75 3.75 0 01-3.75 3.75H9.81l1.018 1.018a.75.75 0 11-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 111.06 1.06L9.811 12h2.439a2.25 2.25 0 002.25-2.25v-5a2.25 2.25 0 00-2.25-2.25h-8.5A2.25 2.25 0 001.5 4.75v5A2.25 2.25 0 003.75 12H5v1.5H3.75A3.75 3.75 0 010 9.75v-5z"></path>
+              <path d="M12.7 1a.7.7 0 00-.7.7v5.15L2.05 1.107A.7.7 0 001 1.712v12.575a.7.7 0 001.05.607L12 9.149V14.3a.7.7 0 00.7.7h1.6a.7.7 0 00.7-.7V1.7a.7.7 0 00-.7-.7h-1.6z"></path>
             </svg>
           </button>
         </div>

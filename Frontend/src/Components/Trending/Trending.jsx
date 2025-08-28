@@ -7,7 +7,7 @@ const Trending = ({ setcurrentpage, setcurrentEle }) => {
   const navigate = useNavigate();
   
   const handleShowAll = () => {
-    navigate('/trending-songs');
+    navigate('/trending');
   };
 
   return (
