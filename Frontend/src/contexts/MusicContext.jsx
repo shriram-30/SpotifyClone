@@ -68,7 +68,7 @@ export const MusicProvider = ({ children }) => {
     return trendingSongs.slice(0, limit);
   };
 
-  // Toggle shuffle on/off
+  // Toggle shuffle on/off using Fisher-Yates shuffle algorithm
   const toggleShuffle = () => {
     if (isShuffled) {
       // Reset to original order

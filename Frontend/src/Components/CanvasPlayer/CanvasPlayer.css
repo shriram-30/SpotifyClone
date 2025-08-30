@@ -1,0 +1,96 @@
+/* Canvas container */
+.canvas-sidebar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background: #000;
+  position: relative;
+}
+
+/* Video & fallback */
+.canvas-video,
+.fallback-background {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fallback-background {
+  background: linear-gradient(45deg, #1e3c72, #2a5298);
+}
+
+.track-info-top{
+    position: absolute;
+    top: 20px; /*to place the text top*/
+    left: 5px; /*space from left side*/
+    right: 5px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+.track-info-bottom{
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 20px;
+    left: 5px;
+    right: 5px;
+    color: white;
+    text-shadow:  0 1px 3px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+}
+.track-name-main{
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.artist-name{
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.track-name{
+    font-size: 18px;
+    font-weight: 300;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll 8s linear infinite; 
+}
+@keyframes scroll {
+    0% {
+        transform: translateX(0); /* Normala irukum */
+      }
+      /* 100% nu end panna position */
+      100% {
+        transform: translateX(-100%); /* Fulla left side ku poidum */
+      }
+  }
+/* Gradient overlay */
+.canvas-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+  box-sizing: border-box;
+}
+  

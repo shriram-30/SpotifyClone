@@ -6,6 +6,7 @@ import { fetchTrackById } from '../../Config/config';
 import { useMusic } from '../../contexts/MusicContext';
 import Navbar from '../../Components/navbar/Navbar';
 import SideBar from '../../Components/Sidebar/SideBar';
+import CanvasPlayer from '../../Components/CanvasPlayer/CanvasPlayer';
 
 // Create a single instance of FastAverageColor outside the component
 const fac = new FastAverageColor();
@@ -22,7 +23,7 @@ const SpecificMusicPage = () => {
   const [duration, setDuration] = useState(0);
 
   const audioRef = useRef(null);
-
+  const[showCanvas,setShowCanvas]=useState(false);
   // Music context
   const { currentSong, isPlaying, togglePlayPause, playSong } = useMusic();
 
@@ -151,6 +152,7 @@ const SpecificMusicPage = () => {
   const isCurrentSong = currentSong?.id === currentEle?._id;
 
   const handlePlayClick = useCallback(() => {
+    setShowCanvas(true);
     if (currentEle) {
       const songData = {
         id: currentEle._id,
@@ -174,20 +176,21 @@ const SpecificMusicPage = () => {
   return (
     <div className="home-layout">
       <Navbar />
-      <div className="home-body">
+      <div className={`home-body ${showCanvas ? 'with-canvas' : ''}`}>
         <aside className="home-sidebar">
           <SideBar />
         </aside>
 
-        <section className="home-main" style={{ background: backgroundGradient }}>
-          <div className="content-wrapper">
-            <div className="music-container">
-              <img src={track.imgsrc} alt="music" className="music-image" />
-              <div className="music-details">
-                <h1 className="heading">{track.heading}</h1>
-                <h2>{track.subheading}</h2>
+        <div className="main-content-container">
+          <section className="home-main" style={{ background: backgroundGradient }}>
+            <div className="content-wrapper">
+              <div className="music-container">
+                <img src={track.imgsrc} alt="music" className="music-image" />
+                <div className="music-details">
+                  <h1 className="heading">{track.heading}</h1>
+                  <h2>{track.subheading}</h2>
+                </div>
               </div>
-            </div>
 
             {/* Player Row (Play button + Track info + controls) */}
             <div
@@ -318,7 +321,18 @@ const SpecificMusicPage = () => {
               )}
             </div>
           </div>
-        </section>
+          </section>
+        </div>
+        
+        {/* Right side Canvas Player - always in DOM but width is controlled by grid */}
+        <div className={`canvas-player-container ${!showCanvas ? 'hidden' : ''}`}>
+          {track?.canvasUrl && (
+            <>
+              <div className="canvas-close" onClick={() => setShowCanvas(false)}>×</div>
+              <CanvasPlayer videoUrl={track.canvasUrl} trackName={track.heading}  artistName={track.subheading}/>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react'
+import React, { Suspense, useCallback } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { MusicProvider } from './contexts/MusicContext';
 import MusicBar from './Pages/Musicbar/Musicbar';
@@ -9,14 +9,17 @@ import SpecificMusicPage from './Pages/specificMusicPage/specificMusicPage.jsx'
 import TrendingSongs from './Pages/TrendingSongs/TrendingSongs.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 
-const AuthForm = React.lazy(() => import('./Pages/Login/Login.jsx'))
 
+const AuthForm = React.lazy(() => import('./Pages/Login/Login.jsx'))
 function App() {
+
   return (
     <MusicProvider>
       <BrowserRouter>
         <Suspense fallback={<div style={{ padding: 20 }}>Loading...</div>}>
           <div className="app-container">
+            
+            
             <div className="content-wrap" style={{ paddingBottom: '90px' }}>
               <Routes>
                 <Route path="/" element={<Mainpage />} />
@@ -43,7 +46,7 @@ function App() {
         </Suspense>
       </BrowserRouter>
     </MusicProvider>
-  )
+  );
 }
 
 export default App
