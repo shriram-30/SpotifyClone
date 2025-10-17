@@ -10,7 +10,15 @@ connectDB();
 
 const app=express();
 
-app.use(cors());
+// Configure CORS with client URL from environment variables
+const corsOptions = {
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use('/api/auth',authRoutes);
