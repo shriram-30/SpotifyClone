@@ -4,7 +4,7 @@ import { FastAverageColor } from 'fast-average-color';
 import './specificMusic.css';
 import { fetchTrackById } from '../../Config/config';
 import { useMusic } from '../../contexts/MusicContext';
-import Navbar from '../../Components/navbar/Navbar';
+import Navbar from '../../Components/Navbar/Navbar';
 import SideBar from '../../Components/Sidebar/SideBar';
 import CanvasPlayer from '../../Components/CanvasPlayer/CanvasPlayer';
 
@@ -130,6 +130,8 @@ const SpecificMusicPage = () => {
       }
     };
   }, [currentEle]);
+
+  // NOTE: canvas will only open on explicit user action (play button click)
 
   // Update document title
   useEffect(() => {
@@ -324,13 +326,21 @@ const SpecificMusicPage = () => {
           </section>
         </div>
         
-        {/* Right side Canvas Player - always in DOM but width is controlled by grid */}
+        {/* Right side Canvas Player - grid-based container (keeps layout) */}
         <div className={`canvas-player-container ${!showCanvas ? 'hidden' : ''}`}>
-          {track?.canvasUrl && (
-            <>
-              <div className="canvas-close" onClick={() => setShowCanvas(false)}>×</div>
-              <CanvasPlayer videoUrl={track.canvasUrl} trackName={track.heading}  artistName={track.subheading}/>
-            </>
+          {/* keep this empty or minimal - used by the layout grid when with-canvas is active */}
+        </div>
+
+        {/* Also render a fixed-position canvas panel (matches other pages) so the CanvasPlayer is visible */}
+        <div className={`canvas-panel ${showCanvas ? 'visible' : ''}`}>
+          {track && showCanvas && (
+            <CanvasPlayer
+              videoUrl={track?.canvasUrl || null}
+              imageUrl={track?.imgsrc || null}
+              trackName={track?.heading}
+              artistName={track?.subheading}
+              onClose={() => setShowCanvas(false)}
+            />
           )}
         </div>
       </div>

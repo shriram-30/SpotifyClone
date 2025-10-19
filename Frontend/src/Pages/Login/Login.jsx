@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css';
-import { FaSpotify, FaFacebook } from 'react-icons/fa';
-import { FcGoogle } from 'react-icons/fc';
+import { FaSpotify } from 'react-icons/fa';
 
 const AuthForm = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -13,7 +12,6 @@ const AuthForm = () => {
         password: ""
     });
     const [confirmEmail, setConfirmEmail] = useState("");
-    const [rememberMe, setRememberMe] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
@@ -37,8 +35,8 @@ const AuthForm = () => {
         }
 
         const endpoint = isLogin 
-            ? 'http://localhost:5000/api/auth/login' 
-            : 'http://localhost:5000/api/auth/register';
+            ? 'https://spotifyclone-1-58hp.onrender.com/api/auth/login' 
+            : 'https://spotifyclone-1-58hp.onrender.com/api/auth/register';
 
         try {
             const payload = { 
@@ -72,19 +70,6 @@ const AuthForm = () => {
             <div className="auth-container">
                 <div className="auth-box">
                     <h1>{isLogin ? 'Log in to Spotify' : 'Sign up for free to start listening.'}</h1>
-                    
-                    <div className="social-login">
-                        <button className="btn btn-facebook">
-                            <FaFacebook className="social-icon" />
-                            Continue with Facebook
-                        </button>
-                        <button className="btn btn-google">
-                            <FcGoogle className="social-icon" />
-                            Continue with Google
-                        </button>
-                    </div>
-                    
-                    <div className="divider">or</div>
                     
                     {error && <div className="error-message">{error}</div>}
                     
@@ -148,15 +133,6 @@ const AuthForm = () => {
                         
                         {isLogin && (
                             <div className="form-options">
-                                <label className="checkbox-container">
-                                    <input
-                                        type="checkbox"
-                                        checked={rememberMe}
-                                        onChange={() => setRememberMe(!rememberMe)}
-                                    />
-                                    <span className="checkmark"></span>
-                                    Remember me
-                                </label>
                                 <a href="#forgot" className="forgot-password">Forgot your password?</a>
                             </div>
                         )}
@@ -186,18 +162,6 @@ const AuthForm = () => {
                 </div>
             </div>
             
-            <footer className="auth-page-footer">
-                <div className="footer-content">
-                    <div className="footer-links">
-                        <a href="#terms">Terms and Conditions</a>
-                        <a href="#privacy">Privacy Policy</a>
-                        <a href="#cookies">Cookies</a>
-                    </div>
-                    <div className="copyright">
-                        {new Date().getFullYear()} Spotify AB
-                    </div>
-                </div>
-            </footer>
         </div>
     );
 };

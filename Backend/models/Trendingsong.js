@@ -7,10 +7,13 @@ const trendingSongSchema = new mongoose.Schema(
     heading: { type: String, required: true },
     subheading: { type: String, required: true },
     music: { type: String, required: true },
-    canvasUrl:{type: String, required: true},
+    canvasUrl: { type: String, required: true },
   },
   { timestamps: true, collection: 'tracks' } // use 'tracks' collection
 );
 
-const TrendingSong = mongoose.model('TrendingSong', trendingSongSchema);
+// Check if the model exists before compiling it
+const TrendingSong = mongoose.models.TrendingSong || 
+                    mongoose.model('TrendingSong', trendingSongSchema);
+
 export default TrendingSong;

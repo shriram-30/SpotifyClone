@@ -5,10 +5,13 @@
     height: auto;
     padding: 16px 8px 8px 8px;
     box-sizing: border-box;
+    margin-bottom: 100px;
+    
 }
 .PopularArtistContent span{
     font-size: 1.5rem;
     font-weight: 900;
     display: block;
+    gap: 4px;
     margin: 0 8px 12px 8px;
 }

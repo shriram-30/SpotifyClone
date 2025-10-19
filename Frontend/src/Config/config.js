@@ -31,8 +31,8 @@ export const ArtistDetails=[
   }
 ]
 
-// Dynamic API helpers
-const API_BASE = import.meta?.env?.VITE_API_URL || 'http://localhost:5000';
+// Using default backend URL
+const API_BASE = 'https://spotifyclone-1-58hp.onrender.com';
 
 /**
  * Fetch trending cards from backend

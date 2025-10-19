@@ -1,0 +1,163 @@
+/* Main container for albums section */
+.TrendingContent {
+  padding: 0 24px 24px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.TrendingContent > span:first-child {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  display: block;
+  padding: 0 0 16px 0;
+}
+
+/* Show All link */
+.showAll {
+  position: absolute;
+  right: 24px;
+  top: 0;
+  color: #b3b3b3;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.showAll:hover {
+  color: #1db954;
+  text-decoration: underline;
+}
+
+/* Loading and error states */
+.loading,
+.error {
+  color: #b3b3b3;
+  padding: 20px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.error {
+  color: #f15e6c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .TrendingContent {
+    padding: 0 16px 16px;
+  }
+  
+  .TrendingContent > span:first-child {
+    font-size: 1.3rem;
+  }
+  
+  .showAll {
+    right: 16px;
+  }
+}
+
+/* Use the same card styles as trending songs */
+.TrendingCardContent {
+  display: flex;
+  overflow-x: auto;
+  gap: 24px;
+  margin-top: 1rem;
+  padding: 8px 0 24px 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.TrendingCardContent::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card styles */
+.CardContent {
+  flex: 0 0 180px;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.CardContent:hover {
+  background: #282828;
+  transform: translateY(-4px);
+}
+
+.song-cover {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: #282828;
+}
+
+.CardContainerText {
+  flex: 1;
+  min-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-artist {
+  font-size: 0.875rem;
+  color: #b3b3b3;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.play-button {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 40px;
+  height: 40px;
+  background: #1db954;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.CardContent:hover .play-button {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.play-button:hover {
+  transform: scale(1.1) translateY(0);
+  background: #1ed760;
+}

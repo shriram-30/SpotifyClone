@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import './mainsection.css';
 import Trending from '../Trending/Trending.jsx';
 import PopularArtist from '../PopularArtist/PopularArtist.jsx';
-import SpecificMusicPage from '../../Pages/specificMusicPage/specificMusicPage.jsx'; // <-- fixed import
+import Albums from '../Albums/Albums.jsx';
+import SpecificMusicPage from '../../Pages/specificMusicPage/specificMusicPage.jsx';
 
 const MainSection = () => {
   const [currentpage, setcurrentpage] = useState("home");
@@ -15,6 +16,7 @@ const MainSection = () => {
         currentpage === 'home' ? (
           <>
             <Trending setcurrentEle={setcurrentEle} setcurrentpage={setcurrentpage} />
+            <Albums />
             <PopularArtist setcurrentpage={setcurrentpage} />
           </>
         ) : currentpage === "musicSpecificpage" ? (

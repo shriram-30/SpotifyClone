@@ -1,8 +1,29 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import TrendingSong from '../models/Trendingsong.js';
+import Album from '../models/Album.js';
 
 const router = Router();
+
+// Get all albums
+router.get('/albums', async (req, res) => {
+    try {
+        const albums = await Album.find({});
+        res.status(200).json({
+            success: true,
+            count: albums.length,
+            data: albums
+        });
+    } catch (error) {
+        console.error('Error fetching albums:', error);
+        res.status(500).json({ 
+            success: false,
+            status: 'error', 
+            message: 'Failed to fetch albums',
+            error: error.message 
+        });
+    }
+});
 
 // Get all trending songs
 router.get('/trending-songs', async (req, res) => {
@@ -22,6 +43,110 @@ router.get('/trending-songs', async (req, res) => {
             status: 'error', 
             message: 'Failed to fetch trending songs',
             error: error.message 
+        });
+    }
+});
+
+// Search songs by name
+router.get('/tracks/search', async (req, res) => {
+    try {
+        const { q } = req.query;
+        
+        if (!q || q.trim() === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Search query is required'
+            });
+        }
+
+        // Search in both TrendingSong and Album.songs
+        const [trendingSongs, albums] = await Promise.all([
+            TrendingSong.find({
+                $or: [
+                    { title: { $regex: q, $options: 'i' } },
+                    { songName: { $regex: q, $options: 'i' } },
+                    { artist: { $regex: q, $options: 'i' } },
+                    { 'artists.name': { $regex: q, $options: 'i' } }
+                ]
+            }).limit(20),
+            
+            Album.aggregate([
+                { $unwind: '$songs' },
+                { $match: {
+                    $or: [
+                        { 'songs.title': { $regex: q, $options: 'i' } },
+                        { 'songs.songName': { $regex: q, $options: 'i' } },
+                        { 'songs.artist': { $regex: q, $options: 'i' } },
+                        { 'songs.artists.name': { $regex: q, $options: 'i' } },
+                        { albumname: { $regex: q, $options: 'i' } }
+                    ]
+                }},
+                { $project: {
+                    _id: '$songs._id',
+                    title: '$songs.title',
+                    songName: '$songs.songName',
+                    artist: '$songs.artist',
+                    artists: '$songs.artists',
+                    duration: '$songs.duration',
+                    url: '$songs.url',
+                    // Include album info directly on the song for easier access
+                    albumName: '$albumname',
+                    albumId: '$_id',
+                    albumImage: '$imageUrl',
+                    // Keep nested album object for backward compatibility
+                    album: {
+                        _id: '$_id',
+                        name: '$albumname',
+                        imageUrl: '$imageUrl'
+                    },
+                    // Include direct image URL for easy access in search results
+                    imageUrl: '$songs.imageUrl || $imageUrl',
+                    createdAt: '$songs.createdAt',
+                    updatedAt: '$songs.updatedAt'
+                }}
+            ]).limit(20)
+        ]);
+
+        // Format trending songs and ensure they have album image if available
+        const formattedTrendingSongs = trendingSongs.map(song => {
+            const songObj = song.toObject();
+            // If song doesn't have an image but is associated with an album, use album's image
+            if (!songObj.imageUrl && songObj.album?.imageUrl) {
+                songObj.imageUrl = songObj.album.imageUrl;
+            }
+            return {
+                ...songObj,
+                fromAlbum: false
+            };
+        });
+
+        // Combine and deduplicate results
+        const seen = new Set();
+        const allSongs = [
+            ...formattedTrendingSongs,
+            ...albums.map(song => ({
+                ...song,
+                fromAlbum: true
+            }))
+        ].filter(song => {
+            const key = song._id || (song.title || song.songName) + (song.artist || '');
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+
+        res.status(200).json({
+            success: true,
+            count: allSongs.length,
+            data: allSongs
+        });
+
+    } catch (error) {
+        console.error('Error searching songs:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to search songs',
+            error: error.message
         });
     }
 });

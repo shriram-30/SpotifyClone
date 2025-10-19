@@ -10,12 +10,45 @@
   position: relative;
 }
 
+/* Close button */
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.2s;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* Video & fallback */
 .canvas-video,
+.canvas-image,
 .fallback-background {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.canvas-video,
+.canvas-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .fallback-background {

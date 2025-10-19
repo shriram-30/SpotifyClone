@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { fetchTrending } from '../Config/config';
 
 export const MusicContext = createContext(null);
@@ -8,12 +8,14 @@ export const MusicProvider = ({ children }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [trendingSongs, setTrendingSongs] = useState([]);
   const [playbackQueue, setPlaybackQueue] = useState([]);
+  const [currentPlaylist, setCurrentPlaylist] = useState([]);
+  const [currentPlaylistIndex, setCurrentPlaylistIndex] = useState(0);
   const [isShuffled, setIsShuffled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const audioRef = React.useRef(null);
+  const audioRef = useRef(null);
 
-  // Fetch all trending songs
+  // Fetch trending songs
   useEffect(() => {
     const fetchAllTrendingSongs = async () => {
       try {
@@ -21,7 +23,7 @@ export const MusicProvider = ({ children }) => {
         const data = await fetchTrending();
         if (Array.isArray(data)) {
           setTrendingSongs(data);
-          setPlaybackQueue([...data]); // Initialize playback queue with original order
+          setPlaybackQueue([...data]);
         }
       } catch (err) {
         console.error('Error fetching trending songs:', err);
@@ -30,7 +32,6 @@ export const MusicProvider = ({ children }) => {
         setIsLoading(false);
       }
     };
-
     fetchAllTrendingSongs();
   }, []);
 
@@ -38,117 +39,155 @@ export const MusicProvider = ({ children }) => {
     console.log('Playing song:', song);
     setCurrentSong(song);
     setIsPlaying(true);
-    // Small delay to ensure audio element is in the DOM
-    setTimeout(() => {
+
+    if (!audioRef.current) return;
+
+    const audio = audioRef.current;
+    let isMounted = true;
+
+    // Remove any previous listeners
+    audio.replaceWith(audio.cloneNode(true));
+    audioRef.current = document.querySelector('audio');
+    audioRef.current.src = song.music;
+    audioRef.current.load();
+
+    const handleCanPlay = () => {
+      if (!isMounted) return;
+      audioRef.current
+        .play()
+        .then(() => console.log('Playback started successfully'))
+        .catch((e) => console.error('Playback failed:', e));
+
+      audioRef.current.removeEventListener('canplay', handleCanPlay);
+    };
+
+    audioRef.current.addEventListener('canplay', handleCanPlay);
+
+    // Cleanup if component unmounts or song changes
+    return () => {
+      isMounted = false;
       if (audioRef.current) {
-        console.log('Audio element found, attempting to play...');
-        audioRef.current.src = song.music;
-        audioRef.current.play()
-          .then(() => console.log('Playback started successfully'))
-          .catch(e => console.error("Playback failed:", e));
-      } else {
-        console.error('Audio ref is not available');
+        audioRef.current.pause();
+        audioRef.current.src = '';
+        audioRef.current.load();
       }
-    }, 100);
+    };
   };
 
   const togglePlayPause = () => {
     if (!audioRef.current) return;
-    
+
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play().catch(e => console.error("Playback failed:", e));
+      audioRef.current.play().catch((e) => console.error('Playback failed:', e));
     }
     setIsPlaying(!isPlaying);
   };
 
-  // Get limited number of trending songs for the home page
-  const getLimitedTrendingSongs = (limit = 9) => {
-    return trendingSongs.slice(0, limit);
-  };
+  const getLimitedTrendingSongs = (limit = 9) => trendingSongs.slice(0, limit);
 
-  // Toggle shuffle on/off using Fisher-Yates shuffle algorithm
   const toggleShuffle = () => {
     if (isShuffled) {
-      // Reset to original order
-      setPlaybackQueue([...trendingSongs]);
+      setPlaybackQueue(currentPlaylist.length > 0 ? [...currentPlaylist] : [...trendingSongs]);
     } else {
-      // Create a shuffled copy of the songs
-      const shuffled = [...trendingSongs];
+      const songsToShuffle = currentPlaylist.length > 0 ? [...currentPlaylist] : [...trendingSongs];
+      const shuffled = [...songsToShuffle];
+
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
+
+      if (currentSong) {
+        const idx = shuffled.findIndex((s) => s._id === currentSong._id);
+        if (idx > 0) [shuffled[0], shuffled[idx]] = [shuffled[idx], shuffled[0]];
+      }
+
       setPlaybackQueue(shuffled);
     }
     setIsShuffled(!isShuffled);
   };
 
-  // Play the next song in the queue
   const playNextSong = () => {
-    if (playbackQueue.length === 0 || !currentSong) return;
-    
-    const currentIndex = playbackQueue.findIndex(song => song._id === currentSong._id);
-    if (currentIndex === -1) return;
-    
-    const nextIndex = (currentIndex + 1) % playbackQueue.length;
-    playSong(playbackQueue[nextIndex]);
+    const activePlaylist = currentPlaylist.length > 0 ? currentPlaylist : playbackQueue;
+    if (!currentSong || activePlaylist.length === 0) return;
+
+    let idx = activePlaylist.findIndex((s) => s._id === currentSong._id);
+    if (idx === -1) return;
+
+    const nextIdx = (idx + 1) % activePlaylist.length;
+    playSong(activePlaylist[nextIdx]);
   };
 
-  // Play the previous song in the queue
   const playPreviousSong = () => {
-    if (playbackQueue.length === 0 || !currentSong) return;
-    
-    const currentIndex = playbackQueue.findIndex(song => song._id === currentSong._id);
-    if (currentIndex === -1) return;
-    
-    const prevIndex = (currentIndex - 1 + playbackQueue.length) % playbackQueue.length;
-    playSong(playbackQueue[prevIndex]);
+    const activePlaylist = currentPlaylist.length > 0 ? currentPlaylist : playbackQueue;
+    if (!currentSong || activePlaylist.length === 0) return;
+
+    const audio = audioRef.current;
+    if (audio && audio.currentTime > 2) {
+      audio.currentTime = 0;
+      audio.play().catch(console.error);
+      return;
+    }
+
+    let idx = activePlaylist.findIndex((s) => s._id === currentSong._id);
+    if (idx === -1) return;
+
+    const prevIdx = (idx - 1 + activePlaylist.length) % activePlaylist.length;
+    playSong(activePlaylist[prevIdx]);
   };
 
-  const findCurrentSongIndex = () => {
-    if (!currentSong) return -1;
-    return playbackQueue.findIndex(song => song._id === currentSong._id);
+  const setPlaylist = (songs, startIndex = 0) => {
+    if (!Array.isArray(songs)) {
+      console.error('setPlaylist: Expected an array of songs');
+      return;
+    }
+
+    setCurrentPlaylist(songs);
+    setCurrentPlaylistIndex(startIndex);
+
+    if (songs.length > 0 && startIndex >= 0 && startIndex < songs.length) {
+      playSong(songs[startIndex]);
+    }
   };
 
   return (
-
-    <MusicContext.Provider value={{ 
-      currentSong, 
-      isPlaying,
-      playSong, 
-      togglePlayPause,
-      audioRef,
-      trendingSongs,
-      getLimitedTrendingSongs,
-      isLoading,
-      isShuffled,
-      toggleShuffle,
-      playNextSong,
-      playPreviousSong,
-      error
-    }}>
+    <MusicContext.Provider
+      value={{
+        currentSong,
+        isPlaying,
+        trendingSongs,
+        playbackQueue,
+        currentPlaylist,
+        currentPlaylistIndex,
+        isShuffled,
+        isLoading,
+        error,
+        audioRef,
+        playSong,
+        togglePlayPause,
+        playNextSong,
+        playPreviousSong,
+        toggleShuffle,
+        setCurrentPlaylist: setPlaylist,
+        getLimitedTrendingSongs,
+      }}
+    >
       {children}
-      {/* Hidden audio element */}
-      {currentSong && (
-        <audio
-          ref={audioRef}
-          src={currentSong.music}
-          onEnded={() => setIsPlaying(false)}
-          onPause={() => setIsPlaying(false)}
-          onPlay={() => setIsPlaying(true)}
-          style={{ display: 'none' }}
-        />
-      )}
+      <audio
+        ref={audioRef}
+        style={{ display: 'none' }}
+        onEnded={() => setIsPlaying(false)}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+      />
     </MusicContext.Provider>
   );
 };
 
 export const useMusic = () => {
   const context = useContext(MusicContext);
-  if (!context) {
-    throw new Error('useMusic must be used within a MusicProvider');
-  }
+  if (!context) throw new Error('useMusic must be used within a MusicProvider');
   return context;
 };

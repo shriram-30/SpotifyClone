@@ -197,14 +197,18 @@ const MusicBar = () => {
         {currentSong && (
           <>
             <img 
-              src={currentSong.imgsrc} 
-              alt={currentSong.heading}
+              src={currentSong.image || currentSong.imgsrc || currentSong.album?.imageUrl || 'https://via.placeholder.com/56'} 
+              alt={currentSong.title || 'Song cover'}
               style={{
                 width: '56px',
                 height: '56px',
                 objectFit: 'cover',
                 borderRadius: '4px',
                 flexShrink: 0
+              }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/56';
               }}
             />
             <div style={{
@@ -242,7 +246,7 @@ const MusicBar = () => {
                 lineHeight: '16px',
                 marginTop: '2px'
               }}>
-                {currentSong.artist || currentSong.subheading || ''}
+                {currentSong.artists || currentSong.subheading || ''}
               </div>
             </div>
           </>

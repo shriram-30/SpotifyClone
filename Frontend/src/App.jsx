@@ -6,6 +6,8 @@ import './App.css'
 import Mainpage from './Pages/Main/Mainpage.jsx'
 import HomePage from './Pages/Home/Home.jsx'
 import SpecificMusicPage from './Pages/specificMusicPage/specificMusicPage.jsx'
+import SpecificAlbumPage from './Pages/SpecificAlbumPage/SpecificAlbumPage.jsx'
+import SpecificArtistPage from './Pages/SpecificArtistPage/SpecificArtistPage.jsx'
 import TrendingSongs from './Pages/TrendingSongs/TrendingSongs.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 
@@ -29,6 +31,8 @@ function App() {
                   <Route path="/home" element={<HomePage />} />
                   <Route path="/trending" element={<TrendingSongs />} />
                   <Route path="/track/:id" element={<SpecificMusicPage />} />
+                  <Route path="/album/:id" element={<SpecificAlbumPage />} />
+                  <Route path="/artist/:artistId" element={<SpecificArtistPage />} />
                   
                 </Route>
               </Routes>
